@@ -1,0 +1,9 @@
+flask
+requests
+duckdb
+pandas
+rank_bm25
+langchain_community
+langchain-openai
+langchain_huggingface
+faiss-gpu
