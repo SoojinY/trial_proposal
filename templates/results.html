@@ -12,16 +12,6 @@
         .card-body { padding: 2rem; }
         .success { color: #28a745; font-weight: bold; }
         .failure { color: #dc3545; font-weight: bold; }
-        .markdown-content {
-            font-family: 'Courier New', monospace; 
-            background-color: #f0f0f0; 
-            padding: 15px; 
-            border-radius: 5px; 
-            white-space: pre-wrap;
-            border: 1px solid #ccc;
-            overflow-x: auto;
-        }
-        pre { white-space: pre-wrap; }
     </style>
 </head>
 <body>
@@ -35,9 +25,9 @@
                     <button 
                     class="accordion-button {% if not loop.first %}collapsed{% endif %}" 
                     type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ loop.index }}">
-                        <span style="padding:0 0 0 2rem;" class="{% if trial.success %}success{% else %}failure{% endif %}">{{ '성공' if trial.success else '실패' }}</span> <strong>{{ trial.nct_id }}</strong> 
-                        <span style="padding:0 2rem 0 0;">{{trial.brief_title}}</span> 
-                    </button>
+                    <span style="padding:0 2rem 0 0;" class="{% if trial.success %}success{% else %}failure{% endif %}">{{ '성공' if trial.success else '실패' }}</span> <strong>{{ trial.nct_id }}</strong> 
+                    <span style="padding:0 0 0 2rem;">{{trial.brief_title}}</span> 
+                </button>
                 </h2>
                 <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#clinicalTrials">
                     <div class="accordion-body">
@@ -58,62 +48,83 @@
         <h2 class="mt-5 mb-4 text-center">새로운 임상시험 제안</h2>
         <div class="card">
             <div class="card-header">제안된 임상시험</div>
-            <!-- <div class="card-body markdown-content">
-                {{proposal}}
-            </div> -->
             <div class="card-body">
                 <p><strong>ALLOCATION:</strong> {{ proposal.allocation }}</p>
                 <p><strong>INTERVENTION MODEL:</strong> {{ proposal.intervention_model }}</p>
                 <p><strong>MASKING:</strong> {{ proposal.masking }}</p>
                 <p><strong>INTERVENTIONS:</strong>
-                    <!-- <pre>{{ proposal.interventions }}</pre> -->
                     <ul>
+                        {% if "실험군" in  proposal.interventions %}
                         <li><strong>실험군:</strong>
                             <ol>
-                                {% for intervention in proposal.interventions.get("실험군", "정보 없음") %}
+                                {% for intervention in proposal.interventions["실험군"] %}
                                 <li>{{ intervention }}</li>
                                 {% endfor %}
                             </ol>
                         </li>
+                        {% elif "experimental_group" in  proposal.interventions %}
+                        <li><strong>실험군:</strong>
+                            <ol>
+                                {% for intervention in proposal.interventions["experimental_group"] %}
+                                <li>{{ intervention }}</li>
+                                {% endfor %}
+                            </ol>
+                        </li>
+                        {% endif %}
+                        {% if "대조군" in  proposal.interventions %}
                         <li><strong>대조군:</strong>
                             <ol>
-                                {% for intervention in proposal.interventions.get("대조군", "정보 없음") %}
+                                {% for intervention in proposal.interventions["대조군"] %}
                                 <li>{{ intervention }}</li>
                                 {% endfor %}
                             </ol>
                         </li>
+                        {% elif "control_group" in  proposal.interventions %}
+                        <li><strong>대조군:</strong>
+                            <ol>
+                                {% for intervention in proposal.interventions["control_group"] %}
+                                <li>{{ intervention }}</li>
+                                {% endfor %}
+                            </ol>
+                        </li>
+                        {% endif %}
                     </ul>
                 </p>
+                {% if "intervention_design" in proposal %}
                 <p><strong>대조군 구성:</strong>
-                    <!-- <pre>{{ proposal.intervention_design}}</pre> -->
                     <ul>
-                        {% for intervention in proposal.intervention_design %}
+                        {% for intervention in proposal["intervention_design"] %}
                         <li>{{ intervention }}</li>
                         {% endfor %}
-                        <!-- <li><strong>실험군:</strong> {{ proposal.intervention_design[0] }}</li>
-                        <li><strong>대조군:</strong> {{ proposal.intervention_design[1] }}</li> -->
                     </ul>
                 </p>
+                {% endif %}
+                {% if "enrollment" in proposal %}
                 <p><strong>ENROLLMENT:</strong>
                     <ul>
                         {% for enrollment in proposal.enrollment %}
                         <li>{{ enrollment }}</li>
                         {% endfor %}
                     </ul>
-                    <!-- <pre>{{ proposal.enrollment }}</pre> -->
                 </p>
+                {% endif %}
+                {% if "success_rate" in proposal %}
                 <p><strong>성공 확률:</strong> {{ proposal.success_rate }}</p>
+                {% endif %}
+                {% if "risks" in proposal %}
                 <p><strong>주요 리스크:</strong>
-                    <!-- <pre>{{ proposal.risks }}</pre> -->
                     <ul>
                         {% for risk in proposal.risks %}
                         <li>{{ risk }}</li>
                         {% endfor %}
                     </ul>
                 </p>
+                {% endif %}
+                {% if "conclusion" in proposal %}
                 <p><strong>결론:</strong> 
                     <br>{{ proposal.conclusion }}
                 </p>
+                {% endif %}
             </div>
         </div>
     </div>
